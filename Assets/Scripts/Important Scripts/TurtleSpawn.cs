@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using UnityEngine.UI;
 
 public class TurtleSpawn : MonoBehaviour
 {
@@ -29,7 +31,11 @@ public class TurtleSpawn : MonoBehaviour
     private GUIStyle guiStyle = new GUIStyle();
 
     // Hearts
-    private int hearts;
+    public int health;
+    public int numOfHearts;
+    public Image[] hearts;
+    public Sprite fullHeart;
+    public Sprite emptyHeart;
 
 
     // Start is called before the first frame update
@@ -43,7 +49,7 @@ public class TurtleSpawn : MonoBehaviour
         points = 0;
 
         // Health system
-        hearts = 5;
+        //health = 3;
 
         // Spawn random objects code, setting the boundaries of spawning
         // terrain size x
@@ -60,6 +66,32 @@ public class TurtleSpawn : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        // Health stuff
+        if (health > numOfHearts)
+        {
+            health = numOfHearts;
+        }
+        for (int i = 0; i < hearts.Length; i++)
+        {
+            if (i < health)
+            {
+                hearts[i].sprite = fullHeart;
+            }
+            else
+            {
+                hearts[i].sprite = emptyHeart;
+            }
+            if (i < numOfHearts)
+            {
+                hearts[i].enabled = true;
+            }
+            else
+            {
+                hearts[i].enabled = false;
+            }
+        }
+
         // generate objects
         if (currentEnemies < numOfEnemies)
         {
@@ -72,10 +104,10 @@ public class TurtleSpawn : MonoBehaviour
         }
     }
 
-    // When the hearts are gone: die
+    //// When the hearts are gone: die
     void FixedUpdate()
     {
-        if (hearts < 0)
+        if (health <= 0)
         {
             FindObjectOfType<GameManager>().EndGame();
 
@@ -86,9 +118,9 @@ public class TurtleSpawn : MonoBehaviour
     private void GenerateObject(GameObject obj)
     {
         // generate random x position
-        int posx = Random.Range(terrainPosX, terrainPosX + terrainWidth);
+        int posx = UnityEngine.Random.Range(terrainPosX, terrainPosX + terrainWidth);
         // generate random z position
-        int posz = Random.Range(terrainPosZ, terrainPosZ + terrainLength);
+        int posz = UnityEngine.Random.Range(terrainPosZ, terrainPosZ + terrainLength);
         // get the terrain height at the random position
         float posy = Terrain.activeTerrain.SampleHeight(new Vector3(posx, 0, posz));
         // create new gameObject on random position
@@ -104,10 +136,16 @@ public class TurtleSpawn : MonoBehaviour
             Destroy(collision.gameObject);
             currentFood -= 1;
             numOfEnemies += 1;
+
+            if (points%30 == 0)
+            {
+                health += 1;
+                numOfHearts += 1;
+            }
         }else if (collision.collider.tag == "enemy")
         {
             Destroy(collision.gameObject);
-            hearts = hearts - 1;
+            health -= 1;
             currentEnemies -= 1;
         }
 
@@ -118,8 +156,11 @@ public class TurtleSpawn : MonoBehaviour
     {
         guiStyle.fontSize = 40;
         int TextWidth = 200;
-        GUI.Label(new Rect(Screen.width - TextWidth, 10, TextWidth, 100), "Points: " + points.ToString(), guiStyle);
-        GUI.Label(new Rect(Screen.width - TextWidth, 35, TextWidth, 100), "Lives: " + hearts.ToString(), guiStyle);
+        if (health > 0)
+        {
+            GUI.Label(new Rect(Screen.width - TextWidth, 350, TextWidth, 100), "Points: " + points.ToString(), guiStyle);
+
+        }
     }
 
 }

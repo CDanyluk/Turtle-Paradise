@@ -1,41 +1,44 @@
 ﻿//using System.Collections;
 //using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    //// Start is called before the first frame update
-    //void Start()
-    //{
-
-    //}
-
-    //// Update is called once per frame
-    //void Update()
-    //{
-
-    //}
 
     bool gameOver = false;
     string overString = "";
     private GUIStyle guiStyle = new GUIStyle();
+    public Image endScreen;
 
-    public void EndGame ()
+    // Start is called before the first frame update
+    void Start()
+    {
+        endScreen.enabled = false;
+    }
+
+    public void EndGame()
     {
         if (gameOver == false)
         {
             gameOver = true;
-            Debug.Log("GAME OVER");
-            
-        }else if (gameOver == true)
+            endScreen.enabled = true;
+
+        }
+        else if (gameOver == true)
         {
-            overString = "GAME OVER";
+            if (Input.GetKeyDown("s"))
+            {
+                Restart();
+            }
+
         }
     }
 
     void Restart()
     {
-
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     //Handles the text in the corner
